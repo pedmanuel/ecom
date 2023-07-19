@@ -1,54 +1,48 @@
 const express = require("express");
-const compression = require('compression');
-const path = require('path');
-
-
 const mongoose = require("mongoose");
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-
-//para usar um ficheiro de sistema *filesytem
-const {readdirSync} = require("fs");
-
-
-
+const compression = require("compression");
+const fs = require("fs");
+const path = require("path");
 require("dotenv").config();
 
-// app
+// Importar rotas de autenticação
+const authRoutes = require("./routes/auth");
+const port = process.env.PORT || 3000;
 const app = express();
 
-
-// base de dados
+// Base de dados
 mongoose
   .connect(process.env.DATABASE, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useFindAndModify: true,
+    useUnifiedTopology: true, // Adicionado para evitar um aviso de depreciação
   })
   .then(() => console.log("BASE DE DADOS LIGADA"))
   .catch((err) => console.log("ERRO AO CONECTAR BASE DE DADOS", err));
 
-// middlewares
+// Middlewares
+app.use(compression());
 app.use(morgan("dev"));
 app.use(bodyParser.json({ limit: "2mb" }));
 app.use(cors());
 
-//rotas para o heroku
-app.use(compression());
-app.use(express.static(path.join(__dirname, 'build')));
+// Rotas do middleware
+app.use(express.static(path.join(__dirname, "build")));
 
-app.get('*', function(req, res) {
-    res.sendFile(path.join(__dirname, 'build', 'index.html'));
+// Rotas de autenticação
+app.use("/api/auth", authRoutes);
+
+// Configuração da rota principal (para fins de teste)
+app.get("/", (req, res) => {
+  res.send("Servidor Express funcionando corretamente!");
 });
 
-//ler e sicnronizar as rotas
-readdirSync("./routes").map((r)=>
- app.use("/api", require("./routes/" + r))
- );
-
-
-// porta de ligacao do servidor
-const port = process.env.PORT || 3000;
-
 app.listen(port, () => console.log(`O servidor está ligado na porta ${port}`));
+
+
+
+
