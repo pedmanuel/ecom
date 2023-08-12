@@ -14,7 +14,7 @@ mongoose
   .connect(process.env.DATABASE, {
     useNewUrlParser: true,
     useCreateIndex: true,
-    useFindAndModify: false, // Configuração atualizada para evitar a depreciação
+    useFindAndModify: true, // Configuração atualizada para evitar a depreciação
     useUnifiedTopology: true,
   })
   .then(() => console.log("BASE DE DADOS LIGADA"))
