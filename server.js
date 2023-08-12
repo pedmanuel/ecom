@@ -46,6 +46,6 @@ app.get("/buscar-documentos", async (req, res) => {
   }
 });
 
-const port = process.env.PORT || 8000;
+const port = process.env.PORT || 3000;
 
 app.listen(port, () => console.log(`O servidor está ligado na porta ${port}`));
